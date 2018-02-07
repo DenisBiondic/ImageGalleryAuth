@@ -25,7 +25,7 @@ namespace ImageGallery.API.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        [HttpGet()]
+        [HttpGet]
         public IActionResult GetImages()
         {
             // get from repo
@@ -53,7 +53,7 @@ namespace ImageGallery.API.Controllers
             return Ok(imageToReturn);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public IActionResult CreateImage([FromBody] ImageForCreation imageForCreation)
         {
             if (imageForCreation == null)
