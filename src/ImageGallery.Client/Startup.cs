@@ -14,8 +14,8 @@ namespace ImageGallery.Client
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
@@ -63,7 +63,7 @@ namespace ImageGallery.Client
                 Authority = "https://localhost:44308/",
                 RequireHttpsMetadata = true,
                 ClientId = "imagegalleryclient",
-                Scope = { "openid", "profile" },
+                Scope = { "openid", "profile", "imagegalleryapi" },
                 ResponseType = "code id_token",
                 SignInScheme = "Cookies",
                 SaveTokens = true,
@@ -76,8 +76,8 @@ namespace ImageGallery.Client
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Gallery}/{action=Index}/{id?}");
+                    "default",
+                    "{controller=Gallery}/{action=Index}/{id?}");
             });
         }         
     }
