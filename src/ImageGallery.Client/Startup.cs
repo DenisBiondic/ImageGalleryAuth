@@ -67,7 +67,8 @@ namespace ImageGallery.Client
                 ResponseType = "code id_token",
                 SignInScheme = "Cookies",
                 SaveTokens = true,
-                ClientSecret = "secret"
+                ClientSecret = "secret",
+                GetClaimsFromUserInfoEndpoint = true
             });
             
             app.UseStaticFiles();
