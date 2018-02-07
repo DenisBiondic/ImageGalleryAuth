@@ -37,6 +37,15 @@ namespace ImageGallery.API
             var connectionString = Configuration["connectionStrings:imageGalleryDBConnectionString"];
             services.AddDbContext<GalleryContext>(o => o.UseSqlServer(connectionString));
 
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "https://localhost:44308/";
+                    options.RequireHttpsMetadata = true;
+
+                    options.ApiName = "imagegalleryapi";
+                });
+
             // register the repository
             services.AddScoped<IGalleryRepository, GalleryRepository>();
         }
@@ -93,6 +102,8 @@ namespace ImageGallery.API
 
             // seed the DB with data
             galleryContext.EnsureSeedDataForContext();
+
+            app.UseAuthentication();
 			
             app.UseMvc(); 
         }
