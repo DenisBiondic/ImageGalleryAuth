@@ -66,7 +66,8 @@ namespace ImageGallery.Client
                 Scope = { "openid", "profile" },
                 ResponseType = "code id_token",
                 SignInScheme = "Cookies",
-                SaveTokens = true
+                SaveTokens = true,
+                ClientSecret = "secret"
             });
             
             app.UseStaticFiles();
