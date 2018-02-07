@@ -12,6 +12,8 @@ using System.Net.Http;
 using System.IO;
 using ImageGallery.Client.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace ImageGallery.Client.Controllers
@@ -26,10 +28,10 @@ namespace ImageGallery.Client.Controllers
             _imageGalleryHttpClient = imageGalleryHttpClient;
         }
 
-        public async Task Logout()
+        public IActionResult Logout()
         {
-            await HttpContext.Authentication.SignOutAsync("Cookies");
-            await HttpContext.Authentication.SignOutAsync("oidc");
+            return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, 
+                OpenIdConnectDefaults.AuthenticationScheme);
         }
 
         public async Task<IActionResult> Index()
@@ -177,7 +179,7 @@ namespace ImageGallery.Client.Controllers
 
         public async Task WriteOutIdentityInformation()
         {
-            var identityToken = await HttpContext.Authentication.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+            var identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
 
             Debug.WriteLine($"Indetity token: {identityToken}");
 

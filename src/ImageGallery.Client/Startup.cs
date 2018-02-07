@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using ImageGallery.Client.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace ImageGallery.Client
 {
@@ -32,6 +34,28 @@ namespace ImageGallery.Client
             // HttpContext in services by injecting it
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddAuthentication(auth =>
+                {
+                    auth.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    auth.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    auth.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie()
+                .AddOpenIdConnect(x =>
+                {
+                    x.Authority = "https://localhost:44308/";
+                    x.RequireHttpsMetadata = true;
+                    x.ClientId = "imagegalleryclient";
+                    x.Scope.Add("openid");
+                    x.Scope.Add("profile");
+                    x.Scope.Add("imagegalleryapi");
+                    x.ResponseType = "code id_token";
+                    x.SignInScheme = "Cookies";
+                    x.SaveTokens = true;
+                    x.ClientSecret = "secret";
+                    x.GetClaimsFromUserInfoEndpoint = true;
+                });
+
             // register an IImageGalleryHttpClient
             services.AddScoped<IImageGalleryHttpClient, ImageGalleryHttpClient>();
         }
@@ -51,27 +75,9 @@ namespace ImageGallery.Client
             {
                 app.UseExceptionHandler("/Shared/Error");
             }
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = "Cookies"
-            });
-
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
-            {
-                AuthenticationScheme = "oidc",
-                Authority = "https://localhost:44308/",
-                RequireHttpsMetadata = true,
-                ClientId = "imagegalleryclient",
-                Scope = { "openid", "profile", "imagegalleryapi" },
-                ResponseType = "code id_token",
-                SignInScheme = "Cookies",
-                SaveTokens = true,
-                ClientSecret = "secret",
-                GetClaimsFromUserInfoEndpoint = true
-            });
             
             app.UseStaticFiles();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
