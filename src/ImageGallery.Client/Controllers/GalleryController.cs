@@ -26,6 +26,12 @@ namespace ImageGallery.Client.Controllers
             _imageGalleryHttpClient = imageGalleryHttpClient;
         }
 
+        public async Task Logout()
+        {
+            await HttpContext.Authentication.SignOutAsync("Cookies");
+            await HttpContext.Authentication.SignOutAsync("oidc");
+        }
+
         public async Task<IActionResult> Index()
         {
             await WriteOutIdentityInformation();
