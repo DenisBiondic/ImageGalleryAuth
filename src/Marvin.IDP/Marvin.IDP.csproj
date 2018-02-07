@@ -14,8 +14,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\ImageGallery.Client\ImageGallery.Client.csproj" />
-  </ItemGroup>
-
 </Project>
