@@ -1,39 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
-namespace ImageGallery.Client.Services
+namespace ClientCredentialsTestClient
 {
-    public class ImageGalleryHttpClient : IImageGalleryHttpClient
+    class Program
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private HttpClient _httpClient = new HttpClient();
-
-        public ImageGalleryHttpClient(IHttpContextAccessor httpContextAccessor)
+        static void Main(string[] args)
         {
-            _httpContextAccessor = httpContextAccessor;
-        }
-        
-        public async Task<HttpClient> GetClient()
-        {
-            var token = await ServicePrincipal.GetS2SAccessTokenForProdMSAAsync();
-            //var token = await _httpContextAccessor.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
-
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            
-            _httpClient.BaseAddress = new Uri("https://localhost:44301/");
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            return _httpClient;
+            Console.WriteLine(ServicePrincipal.GetS2SAccessTokenForProdMSAAsync().Result.AccessToken);
         }
     }
 
@@ -45,8 +20,8 @@ namespace ImageGallery.Client.Services
         /// You can name each of these what you want as long as you keep all of this straight
         /// </summary>
         private static string authority = "...";
-        private static string clientId = "...";
-        private static string clientSecret = "...";
+        private static string clientId = "...d";
+        private static string clientSecret = "... ";
         private static string resource = "...";
 
         /// <summary>
@@ -62,7 +37,7 @@ namespace ImageGallery.Client.Services
         {
             var clientCredential = new ClientCredential(clientId, clientSecret);
             AuthenticationContext context = new AuthenticationContext(authority, false);
-            
+
             AuthenticationResult authenticationResult = await context.AcquireTokenAsync(
                 resource,  // the resource (app) we are going to access with the token
                 clientCredential);  // the client credentials
@@ -70,4 +45,3 @@ namespace ImageGallery.Client.Services
         }
     }
 }
-

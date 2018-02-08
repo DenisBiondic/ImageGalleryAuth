@@ -53,7 +53,7 @@ namespace ImageGallery.Client.Controllers
                 return View(galleryIndexViewModel);
             }          
 
-            throw new Exception($"A problem happened while calling the API: {response.ReasonPhrase}");
+            throw new Exception($"A problem happened while calling the API: {response}");
         }
 
         public async Task<IActionResult> EditImage(Guid id)

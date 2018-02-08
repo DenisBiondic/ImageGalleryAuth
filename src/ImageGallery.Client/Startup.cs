@@ -43,17 +43,15 @@ namespace ImageGallery.Client
                 .AddCookie()
                 .AddOpenIdConnect(x =>
                 {
-                    x.Authority = "https://localhost:44308/";
+                    x.Authority = "...";
                     x.RequireHttpsMetadata = true;
-                    x.ClientId = "imagegalleryclient";
+                    x.ClientId = "...";
                     x.Scope.Add("openid");
                     x.Scope.Add("profile");
-                    x.Scope.Add("imagegalleryapi");
                     x.ResponseType = "code id_token";
                     x.SignInScheme = "Cookies";
                     x.SaveTokens = true;
-                    x.ClientSecret = "secret";
-                    x.GetClaimsFromUserInfoEndpoint = true;
+                    x.ClientSecret = "...";
                 });
 
             // register an IImageGalleryHttpClient

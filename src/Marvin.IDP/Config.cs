@@ -10,7 +10,7 @@ namespace Marvin.IDP
     {
         public static List<TestUser> GetUsers()
         {
-            return new List<TestUser>()
+            return new List<TestUser>
             {
                 new TestUser
                 {

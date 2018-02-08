@@ -1,4 +1,5 @@
-﻿using ImageGallery.API.Entities;
+﻿using System.Threading.Tasks;
+using ImageGallery.API.Entities;
 using ImageGallery.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ImageGallery.API
 {
@@ -30,25 +32,80 @@ namespace ImageGallery.API
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-                      
             // register the DbContext on the container, getting the connection string from
             // appSettings (note: use this during development; in a production environment,
             // it's better to store the connection string in an environment variable)
             var connectionString = Configuration["connectionStrings:imageGalleryDBConnectionString"];
             services.AddDbContext<GalleryContext>(o => o.UseSqlServer(connectionString));
-            
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddIdentityServerAuthentication(options =>
-                {
-                    options.Authority = "https://localhost:44308/";
-                    options.RequireHttpsMetadata = true;
 
-                    options.ApiName = "imagegalleryapi";
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddIdentityServerAuthentication(options =>
+            //    {
+            //        options.Authority = "https://localhost:44308/";
+            //        options.RequireHttpsMetadata = true;
+
+            //        options.ApiName = "imagegalleryapi";
+            //    });
+
+            TokenValidationParameters tvps = new TokenValidationParameters
+            {
+                ValidAudience = "203a78c7-184f-4bbd-b38e-fa7938a6770d",
+                ValidateAudience = true,
+                ValidIssuer = "https://login.microsoftonline.com/DenisBiondichotmail.onmicrosoft.com",
+                ValidateIssuer = true
+            };
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://login.microsoftonline.com/DenisBiondichotmail.onmicrosoft.com";
+                    options.Audience = "203a78c7-184f-4bbd-b38e-fa7938a6770d";
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = AuthenticationFailed,
+                        OnTokenValidated = OnTokenValidated,
+                        OnChallenge = OnChallenge,
+                        OnMessageReceived = OnMessageRecieved
+                    };
+                    options.TokenValidationParameters = tvps;
                 });
 
             // register the repository
             services.AddScoped<IGalleryRepository, GalleryRepository>();
+
+            services.AddMvc();
+        }
+
+        private Task AuthenticationFailed(AuthenticationFailedContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"AuthenticationFailed: {arg.Exception.Message}";
+            return Task.FromResult(0);
+        }
+
+        private Task OnTokenValidated(TokenValidatedContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"TokenValid: {arg.ToString()}";
+            return Task.FromResult(0);
+        }
+
+        private Task OnChallenge(JwtBearerChallengeContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"Challenge: {arg.ToString()}";
+            return Task.FromResult(0);
+        }
+
+        private Task OnMessageRecieved(MessageReceivedContext arg)
+        {
+            // For debugging purposes only!
+            var s = $"Message: {arg.ToString()}";
+            return Task.FromResult(0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
