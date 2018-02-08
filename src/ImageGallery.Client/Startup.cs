@@ -17,7 +17,7 @@ namespace ImageGallery.Client
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
+                .AddJsonFile($"appsettings.secret.json", true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
@@ -33,6 +33,11 @@ namespace ImageGallery.Client
             // register an IHttpContextAccessor so we can access the current
             // HttpContext in services by injecting it
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IConfiguration>(Configuration);
+
+            string authority = Configuration["Secrets:Authority"];
+            string clientId = Configuration["Secrets:ClientId"];
+            string clientSecret = Configuration["Secrets:ClientSecret"];
 
             services.AddAuthentication(auth =>
                 {
@@ -43,17 +48,17 @@ namespace ImageGallery.Client
                 .AddCookie()
                 .AddOpenIdConnect(x =>
                 {
-                    x.Authority = "...";
+                    x.Authority = authority;
                     x.RequireHttpsMetadata = true;
-                    x.ClientId = "...";
+                    x.ClientId = clientId;
                     x.Scope.Add("openid");
                     x.Scope.Add("profile");
                     x.ResponseType = "code id_token";
                     x.SignInScheme = "Cookies";
                     x.SaveTokens = true;
-                    x.ClientSecret = "...";
+                    x.ClientSecret = clientSecret;
                 });
-
+            
             // register an IImageGalleryHttpClient
             services.AddScoped<IImageGalleryHttpClient, ImageGalleryHttpClient>();
         }
